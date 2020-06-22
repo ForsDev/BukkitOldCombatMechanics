@@ -6,6 +6,7 @@ import kernitus.plugin.OldCombatMechanics.utilities.reflection.type.PacketType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -85,6 +86,10 @@ public class Reflector {
         }
     }
 
+    public static <T extends AccessibleObject> T setAccessible(T object) {
+    	object.setAccessible(true);
+    	return object;
+    }
 
     public static Method getMethod(Class<?> clazz, String name){
         return Arrays.stream(clazz.getMethods())
@@ -129,9 +134,7 @@ public class Reflector {
     }
 
     public static Field getInaccessibleField(Class<?> clazz, String fieldName){
-        Field field = getField(clazz, fieldName);
-        field.setAccessible(true);
-        return field;
+        return setAccessible(getField(clazz, fieldName));
     }
 
     public static Object getFieldValue(Object object, String fieldName) throws Exception{
@@ -152,8 +155,7 @@ public class Reflector {
         while(clazz != null){
             for(Field field : clazz.getDeclaredFields()){
                 if(field.getName().equals(fieldName)){
-                    field.setAccessible(true);
-                    return field;
+                	return setAccessible(field);
                 }
             }
             clazz = clazz.getSuperclass();
@@ -164,9 +166,8 @@ public class Reflector {
 
 
     public static Object getFieldValue(Field field, Object handle){
-        field.setAccessible(true);
         try{
-            return field.get(handle);
+            return setAccessible(field).get(handle);
         } catch(IllegalAccessException e){
             throw new RuntimeException(e);
         }
