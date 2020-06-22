@@ -6,8 +6,10 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -17,6 +19,17 @@ import java.util.stream.Collectors;
 public class TeamUtils {
 
     private static final VersionData VERSION_DATA = new VersionData();
+
+    public static void clone(Object from, Object to) {
+        try{
+            for (Field field : VERSION_DATA.getAllFields()) {
+                field.set(to, field.get(from));
+            }
+        } catch(IllegalAccessException e){
+            // should not happen if the getting works
+            throw new RuntimeException("Error cloning", e);
+        }
+    }
 
     /**
      * Sets the collision rule of the packet.
@@ -148,6 +161,9 @@ public class TeamUtils {
      * changed yet.
      */
     private static class VersionData {
+
+    	private final List<Field> fields;
+
         private final Field fieldCollisionRule;
         private final Field fieldPlayerNames;
         private final Field fieldAction;
@@ -156,12 +172,17 @@ public class TeamUtils {
 
         VersionData(){
             Class<?> packetClass = Reflector.getClass(ClassType.NMS, "PacketPlayOutScoreboardTeam");
+            this.fields = Arrays.stream(packetClass.getDeclaredFields()).map(Reflector::setAccessible).collect(Collectors.toList());
             this.fieldCollisionRule = Reflector.getInaccessibleField(packetClass, "f");
             this.fieldPlayerNames = Reflector.getInaccessibleField(packetClass, "h");
             this.fieldAction = Reflector.getInaccessibleField(packetClass, "i");
             this.fieldName = Reflector.getInaccessibleField(packetClass, "a");
 
             this.constructorTeamPacket = Reflector.getConstructor(packetClass, 0);
+        }
+
+        List<Field> getAllFields() {
+        	return fields;
         }
 
         Field getFieldCollisionRule(){

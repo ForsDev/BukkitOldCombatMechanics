@@ -1,14 +1,15 @@
 package kernitus.plugin.OldCombatMechanics.utilities.teams;
 
-import kernitus.plugin.OldCombatMechanics.utilities.reflection.Reflector;
-import org.bukkit.entity.Player;
-
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.entity.Player;
+
+import kernitus.plugin.OldCombatMechanics.utilities.reflection.Reflector;
+
 public class TeamPacket {
+
     private Object packetShallowClone;
 
     TeamPacket(Object packet){
@@ -98,13 +99,7 @@ public class TeamPacket {
     }
 
     private void cloneFrom(Object packet){
-        try{
-            for(Field declaredField : packet.getClass().getDeclaredFields()){
-                declaredField.setAccessible(true);
-                declaredField.set(packetShallowClone, declaredField.get(packet));
-            }
-        } catch(IllegalAccessException e){
-            throw new RuntimeException("Error cloning packet", e);
-        }
+        TeamUtils.clone(packet, packetShallowClone);
     }
+
 }
