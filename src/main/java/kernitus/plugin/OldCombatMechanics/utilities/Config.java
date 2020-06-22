@@ -1,20 +1,23 @@
 package kernitus.plugin.OldCombatMechanics.utilities;
 
-import kernitus.plugin.OldCombatMechanics.ModuleLoader;
-import kernitus.plugin.OldCombatMechanics.OCMMain;
-import kernitus.plugin.OldCombatMechanics.module.Module;
-import kernitus.plugin.OldCombatMechanics.utilities.damage.EntityDamageByEntityListener;
-import kernitus.plugin.OldCombatMechanics.utilities.damage.WeaponDamages;
+import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
+import kernitus.plugin.OldCombatMechanics.ModuleLoader;
+import kernitus.plugin.OldCombatMechanics.OCMMain;
+import kernitus.plugin.OldCombatMechanics.module.Module;
+import kernitus.plugin.OldCombatMechanics.utilities.damage.EntityDamageByEntityListener;
+import kernitus.plugin.OldCombatMechanics.utilities.damage.WeaponDamages;
 
 /**
  * Created by Rayzr522 on 6/14/16.
@@ -24,7 +27,7 @@ public class Config {
 
     private static OCMMain plugin;
     private static FileConfiguration config;
-    private static List<Material> interactive = new ArrayList<>();
+    private static Set<Material> interactive = Collections.emptySet();
 
     public static void initialise(OCMMain plugin){
         Config.plugin = plugin;
@@ -131,10 +134,10 @@ public class Config {
     }
 
     private static void reloadInteractiveBlocks(){
-        interactive = ConfigUtils.loadMaterialList(config, "interactive");
+        interactive = EnumSet.copyOf(ConfigUtils.loadMaterialList(config, "interactive"));
     }
 
-    public static List<Material> getInteractiveBlocks(){
+    public static Set<Material> getInteractiveBlocks(){
         return interactive;
     }
 
